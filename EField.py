@@ -26,7 +26,7 @@ def step_RK4(x0,y0,func,stepsize):
 	y1 = y0 + stepsize*(k1/6 + k2/3 + k3/3 + k4/6)
 	return y1
 
-ncount = 40
+ncount = 400
 xminmax= [-2.0,2.0]
 stepsize = (xminmax[1] - xminmax[0])/ncount
 init = [-2.0,0.0]
@@ -44,17 +44,17 @@ x_vals = [init[0]]
 x_vals2 = [init[0]]
 y_vals2 = [init[1]]
 n=0
-for n in range(len(rightlist)):
+for n in range(len(r)-1):
 	y_n = y_vals[n]
-	x_n = x_vals[n]
+	x_n = r[n]
 	#y_vals.append(Euler_next_y(y_n,x_n,dE,stepsize))
 	y_vals.append(step_RK4(x_n,y_n,dE,stepsize))
 	x_vals.append(x_n + stepsize)
 	n+=1
 	
-for n in range(len(rightlist)):
+for n in range(len(r)-1):
 	y_n = y_vals2[n]
-	x_n = x_vals2[n]
+	x_n = r[n]
 	y_vals2.append(Euler_next_y(y_n,x_n,dE,stepsize))
 	#y_vals2.append(step_RK4(x_n,y_n,dE,stepsize))
 	x_vals2.append(x_n + stepsize)
@@ -76,12 +76,45 @@ for i in range(len(x_vals)):
 	diffx.append(abs(x_vals[i]-x_vals2[i]))
 	diffy.append(abs(y_vals[i]-y_vals2[i]))
 
+
 ####plotting garbage
-plt.plot(x_vals,y_vals,'r-')
-plt.plot(x_vals,diffy,'y-')
-plt.plot(x_vals2,y_vals2,'g-')
+plt.plot(r,y_vals,'r-')
+plt.plot(r,diffy,'y-')
+plt.plot(r,y_vals2,'g-')
 plt.plot([0,0],[0,0.6],'b-')
 #print max(diffx)
 #print max(diffy)
+plt.figure(1)
+
+
+
+E_y_list = y_vals
+Vy_vals = [0]
+#function to return a value from a list
+#the step funcitions require a function to work so this is a workaround instead of rewriting the step funcitons or writing new, list based ones.
+def E_y(x):
+	return E_y_list[x]
+
+
+
+
+for n in range(len(r)-1):
+	y_n = Vy_vals[n]
+	x_n = r[n]
+	#y_vals.append(Euler_next_y(y_n,x_n,dE,stepsize))
+	Vy_vals.append(step_RK4(n,y_n,E_y,stepsize))
+	Vx_vals.append(x_n + stepsize)
+	n+=1
+
+plt.plot(r,Vy_vals,'r-')
+plt.figure(2)
+
+
+
+
+
+
+
+
 
 plt.show()
