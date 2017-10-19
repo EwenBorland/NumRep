@@ -79,12 +79,12 @@ for i in range(len(x_vals)):
 
 ####plotting garbage
 plt.plot(r,y_vals,'r-')
-plt.plot(r,diffy,'y-')
-plt.plot(r,y_vals2,'g-')
-plt.plot([0,0],[0,0.6],'b-')
+#plt.plot(r,diffy,'y-')
+#plt.plot(r,y_vals2,'g-')
+#plt.plot([0,0],[0,0.6],'b-')
 #print max(diffx)
 #print max(diffy)
-plt.figure(1)
+#plt.figure(1)
 
 
 
@@ -97,22 +97,35 @@ def E_y(x):
 
 
 
+def step_RK4_V(x0,y0,func):
+	k1 = func(x0)
+	k2 = func(x0 + 1)
+	k3 = func(x0 + 1)
+	k4 = func(x0 + 2)
+	y1 = y0 + (k4-k1)*(k1/6 + k2/3 + k3/3 + k4/6)
+	return y1
 
-for n in range(len(r)-1):
+
+
+for n in range(len(r)-2):
 	y_n = Vy_vals[n]
 	x_n = r[n]
 	#y_vals.append(Euler_next_y(y_n,x_n,dE,stepsize))
-	Vy_vals.append(step_RK4(n,y_n,E_y,stepsize))
-	Vx_vals.append(x_n + stepsize)
+	Vy_vals.append(step_RK4_V(n,y_n,E_y))
+	#Vx_vals.append(x_n + stepsize)
+	print n
 	n+=1
+rnew = r[:399]
+print "lengths"
+print len(rnew)
+print len(Vy_vals)
+plt.plot(rnew,Vy_vals,'g-')
+#plt.figure(2)
 
-plt.plot(r,Vy_vals,'r-')
-plt.figure(2)
 
 
 
-
-
+plt.ylim(-0.1,0.8)
 
 
 
