@@ -16,6 +16,7 @@ def dE(x,y):
 X = np.arange(-2.0,2.0,0.01)
 
 #plot(X,f(X))
+print enumerate(X)
 
 def F(x):
     res = np.zeros_like(x)

@@ -116,10 +116,10 @@ for n in range((len(r)-2)/2):
 	y_n = Vy_vals[n]
 	x_n = r[n*2]
 	#y_vals.append(Euler_next_y(y_n,x_n,dE,stepsize))
-	Vy_vals.append(step_RK4_V(n,y_n,E_y))
+	Vy_vals.append(step_RK4_V(n*2,y_n,E_y))
 	#Vx_vals.append(x_n + stepsize)
-	print n
-	#n+=1
+	#print n
+	n+=1
 #rnew = r[:399]
 #rnew=np.arange((len(r)-2)/2)[:199]
 print r

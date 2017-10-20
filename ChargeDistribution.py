@@ -24,9 +24,9 @@ class ChargeDistribution:
         return 0.
     
     # To plot the function on the screen
-    def show(self, title='', disp=True ):
+    def show(self, title='', disp=True ,style='m-'):
         xvalues, yvalues = self._get()
-        pl.plot( xvalues, yvalues )
+        pl.plot( xvalues, yvalues , style)
         pl.title( title )
         if(disp):pl.show()
     
