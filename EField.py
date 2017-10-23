@@ -7,7 +7,7 @@ import ChargeDistribution as ChDist
 
 #setup charge distribution
 rho = ChDist.ChargeDistribution()
-#plt.figure(3)
+#plt.figure(0)
 #rho.show(title='title',disp=False)
 
 #define ODE
@@ -19,6 +19,7 @@ def dE(x):
 #Euler method for next y value
 def Euler_next_y(yn_0, xn_0, func, step):
 	return (yn_0 + step*(func(xn_0)))
+
 
 def step_RK4(x0,y0,func,stepsize):
 	k1 = func(x0)
