@@ -118,17 +118,32 @@ for line in data.readlines():
 	y.append(float(spl[1]))
 	ye.append(float(spl[2]))
 data.close()	
-	
-mstart = 0.01
-cstart = 0.95
+
+low_chi = 1000
+#print "start loop"
+##Need a method to estimate good initial parameters(i.e. grid search)
+for c in np.arange(-5,5,0.1):
+	for m in np.arange(-5,10,0.1):
+		chi = chiSq(x,y,ye,polyLine,c,m)
+		if chi < low_chi:
+			#print "lower"
+			cstart = c
+			mstart = m
+#mstart = 0.01
+#cstart = 0.95
+
+print "Starting parameters: m = {0} , c = {1}".format(mstart,cstart)
+print "~~~~~Own ChiSq Method~~~~~"
 
 
 minchi, minchiparams = minimise(chiSq,(x,y,ye,polyLine,cstart,mstart),[4,5],maxsteps=100000000,jumpL=0.0001,lim = 0.000001)
-print minchi
-print minchiparams
+print "Minimum Chi Squared = {0}".format(minchi)
+#print minchiparams
+print "Found at c = {0} and m = {1}\n\n".format(minchiparams[4],minchiparams[5])
 
-
-
+bestc = minchiparams[4]
+bestm = minchiparams[5]
+print "~~~~~Scipy ChiSq Method~~~~~"
 
 #scipy stuff
 def sci_chiSq((c,m)):
@@ -140,21 +155,55 @@ def sci_chiSq((c,m)):
 		c2.append(((true[n]-i)/ye[n])**2)
 	return sum(c2)
 
-x0 = np.array([0.95,0.0]) 
-scipyres = opt.minimize(sci_chiSq,(0.95,0.0))
+x0 = np.array([cstart,mstart]) 
+scipyres = opt.minimize(sci_chiSq,(cstart,mstart))
 
-print scipyres
+#print scipyres.x
+print "Minimum Chi Squared = {0}".format(scipyres.fun)
+#print minchiparams
+print "Found at c = {0} and m = {1}\n\n".format(scipyres.x[0],scipyres.x[1])
 
 
-#test = chiSq(x,y,ye,polyLine,0.95,0.01)	
-#print test
+#varying around the best c and m values
+clist = np.arange(bestc-0.1,bestc+0.1,0.0001)
+chi_clist=[]
+mlist = np.arange(bestm-0.1,bestm+0.1,0.001)
+chi_mlist=[]
+for i in clist:
+	chi_clist.append(chiSq(x,y,ye,polyLine,i,bestm))
+if (bestc+1) in chi_clist:
+	print "found it"
+else:
+	print "not here" 
+print min(chi_clist, key=lambda x:abs(x-(minchi+1)))
+		
+for i in mlist:
+	chi_mlist.append(chiSq(x,y,ye,polyLine,bestc,i))
+	
 
-#testx = [0,10]
-#testy = [polyLine(testx[0],0.95,0.01),polyLine(testx[1],0.95,0.01)]
 
-#plt.errorbar(x,y,yerr=ye,fmt='.')
-#plt.plot(testx,testy,'-')
-#plt.show()
+
+
+plt.figure(0)
+bestx = [-1,11]
+besty = [polyLine(bestx[0],bestc,bestm),polyLine(bestx[1],bestc,bestm)]
+plt.errorbar(x,y,yerr=ye,fmt='.')
+plt.plot(bestx,besty,'-')
+plt.xlim(bestx)
+
+plt.figure(1)
+plt.plot(mlist,chi_mlist,'-')
+plt.plot([bestm,bestm],[0,max(chi_mlist)],'--')
+plt.xlabel("m")
+plt.ylabel("Chi Squared")
+plt.figure(2)
+plt.plot(clist,chi_clist,'-')
+plt.plot([bestc,bestc],[0,max(chi_clist)],'--')
+plt.xlabel("c")
+plt.ylabel("Chi Squared")
+
+plt.show(block=False)
+input()
 	
 	
 		
