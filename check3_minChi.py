@@ -165,21 +165,27 @@ print "Found at c = {0} and m = {1}\n\n".format(scipyres.x[0],scipyres.x[1])
 
 
 #varying around the best c and m values
-clist = np.arange(bestc-0.1,bestc+0.1,0.0001)
+clist = np.arange(bestc-0.05,bestc+0.05,0.0001)
 chi_clist=[]
-mlist = np.arange(bestm-0.1,bestm+0.1,0.001)
+mlist = np.arange(bestm-0.05,bestm+0.05,0.0001)
 chi_mlist=[]
 for i in clist:
 	chi_clist.append(chiSq(x,y,ye,polyLine,i,bestm))
-if (bestc+1) in chi_clist:
-	print "found it"
-else:
-	print "not here" 
-print min(chi_clist, key=lambda x:abs(x-(minchi+1)))
-		
+
 for i in mlist:
 	chi_mlist.append(chiSq(x,y,ye,polyLine,bestc,i))
 	
+c_chiplusoneindex = min(chi_clist, key=lambda x:abs(x-(minchi+1)))
+m_chiplusoneindex = min(chi_mlist, key=lambda x:abs(x-(minchi+1)))
+c_plusone = clist[chi_clist.index(c_chiplusoneindex)]
+m_plusone = mlist[chi_mlist.index(m_chiplusoneindex)]
+cerr = abs(bestc-c_plusone)
+merr = abs(bestm-m_plusone)
+
+print "~~~Results with errors~~~\n"
+print "c = {0} +/- {1} , m = {2} +/- {3} \n\n\n".format(bestc,cerr,bestm,merr)
+
+
 
 
 
