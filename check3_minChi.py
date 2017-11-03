@@ -191,29 +191,32 @@ print "~~~Results with errors~~~\n"
 print "c = {0} +/- {1} , m = {2} +/- {3} \n\n\n".format(bestc,cerr,bestm,merr)
 
 #Plotting
-plt.figure(0)
+plt.figure("data")
 #Data set with errors and the line found using the minimiser
 bestx = [-1,11]
 besty = [polyLine(bestx[0],bestc,bestm),polyLine(bestx[1],bestc,bestm)]
-plt.errorbar(x,y,yerr=ye,fmt='.')
-plt.plot(bestx,besty,'-')
+plt.errorbar(x,y,yerr=ye,fmt='.',label="data")
+plt.plot(bestx,besty,'-',label="Line of best fit")
 plt.xlabel("x")
 plt.ylabel("y")
-plt.title("x vs y plot with best line found using minimiser")
+plt.title("x vs y plot best fit line")
 plt.xlim(bestx)
+plt.legend()
 
 #varying m around minimum chi^2
-plt.figure(1)
+plt.figure("varying m")
 plt.plot(mlist,chi_mlist,'-')
 plt.plot([bestm,bestm],[0,max(chi_mlist)],'--')
 plt.xlabel("m")
+plt.title("Varying 'm' about it's best value")
 plt.ylabel("Chi Squared")
 
 #varying c around minimum chi^2
-plt.figure(2)
+plt.figure("varying c")
 plt.plot(clist,chi_clist,'-')
 plt.plot([bestc,bestc],[0,max(chi_clist)],'--')
 plt.xlabel("c")
+plt.title("Varying 'c' about it's best value")
 plt.ylabel("Chi Squared")
 
 
