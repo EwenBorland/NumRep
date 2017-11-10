@@ -1,4 +1,5 @@
-from scipy import misc      # Import misc 
+import scipy.misc
+#from scipy import misc      # Import misc 
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft ,ifft
 import numpy as np
@@ -7,7 +8,7 @@ import numpy as np
 #fn = str(raw_input("File : "))
 fn = "desync1.pgm"
 #         Read file it np array
-im = misc.imread(fn) 
+im = scipy.misc.imread(fn) 
 print len(im[0])
 #         Display with grayscale colour map 
 
@@ -52,11 +53,11 @@ for c,row in enumerate(im):
 		maxift = ar_m_ift.tolist().index(max(ar_m_ift))
 		ar_iftl.append(maxift)
 		if maxift > 0:
-			#im[c] = np.roll(row,maxift-512)
-			if maxift > 20:
-				im[c] = shift(row,maxift-512)
-			else:
-				im[c] = shift(row,maxift)
+			im[c] = np.roll(row,maxift-512)
+			#if maxift > 20:
+			#	im[c] = shift(row,maxift-512)
+			#else:
+			#	im[c] = shift(row,maxift)
 		pr_ft = fft(im[c])
 
 plt.imshow(im,cmap=plt.cm.gray)		
