@@ -6,7 +6,7 @@ import numpy as np
 
 #         Get the filename as string
 #fn = str(raw_input("File : "))
-fn = "desync1.pgm"
+fn = "desync4.pgm"
 #         Read file it np array
 im = scipy.misc.imread(fn) 
 print len(im[0])
