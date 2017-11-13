@@ -47,8 +47,8 @@ for c, row in enumerate(transformed):
 		row_p = row
 		shift_vals.append(0)
 	else:
-		con = np.conjugate(row)
-		eq = con*row_p
+		con = np.conjugate(row_p)
+		eq = con*row
 		shift_num = np.argmax(ifft(eq))
 		shift_vals.append(shift_num)
 
@@ -93,24 +93,39 @@ for c, shft in enumerate(shift_vals):
 	elif shft <= rowlen-(rowlen*0.8):
 		i -= -1*shft
 	else:
-		i = 0
+		i += 0
 	im[c] = shifter(im[c],i)
 	
 
 
+'''
+la = []
+i==0
+while i <100:
+	la.append(im_org[i])
+	i+=1
 
 
 
 
+x = range(len(im_org))
+#plt.plot(x,im_org[0],'g-')
+#plt.plot(x,fft(im_org[8]),'b-')
+#plt.plot(x,np.conjugate(fft(im_org[9])),'r-')
+l = ifft(fft(im_org[4])*np.conjugate(fft(im_org[5])))
+l2 = ifft(np.conjugate(fft(im_org[4]))*fft(im_org[5]))
+print np.argmax(l)
+print np.argmax(l2)
+plt.plot(x,l2,'r-')
+plt.plot(x,l,'c--')
+#plt.ylim(-5000,5000)
+#plt.ylim(-255,255)
 
 
-
-
-
-
-
-
-
-
-plt.imshow(im,cmap=plt.cm.gray)	
+plt.figure()
+plt.imshow(im_org,cmap=plt.cm.gray)	
+plt.figure()
+plt.imshow(la,cmap=plt.cm.gray)
+'''
+plt.imshow(im,cmap=plt.cm.gray)
 plt.show()
