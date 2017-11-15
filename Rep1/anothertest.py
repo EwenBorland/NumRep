@@ -4,11 +4,11 @@ from scipy.fftpack import fft ,ifft
 import numpy as np
 # 184,216
 #filename
-fn = "desync1.pgm"
+fn = "desync3.pgm"
 #Reading file and making it a numpy array
 im = misc.imread(fn)
 im_org = misc.imread(fn)
-filey = open("rep1testout.txt",'w')
+filey = open("rep1testout3.txt",'w')
 def shifter(l,i):
 	#print "a"
 	p = 0
@@ -21,7 +21,7 @@ def shifter(l,i):
 			#print"aa"
 			l = np.delete(l,len(l)-1)
 			#print "ab"
-			l = np.insert(l,0,100)
+			l = np.insert(l,0,0)
 			#print "ac"
 			p+=1
 	elif i < 0:
@@ -30,49 +30,44 @@ def shifter(l,i):
 			#print "ba" 
 			l = np.delete(l,0)
 			#print "bb"
-			l = np.append(l,100)
+			l = np.append(l,0)
 			#print "bc"
 			p+=1
 	return l
 
-transformed = []
 
-for row in im:
-	transformed.append(fft(np.copy(row)))
 
 shift_vals = []
 i_ = []
 i=0
 rowlen = len(im[0])
-for c, row in enumerate(transformed):
+for c in range(len(im)):
 	if c == 0:
-		row_p = np.copy(row)
 		shift_num = 0
 		
 	else:
-		con = np.conjugate(np.copy(row_p))
-		eq = con*row
-		shift_num = np.argmax(ifft(eq))
+		shift_num = np.argmax(ifft((np.conjugate(fft(im[c-1])))*fft(im[c])))
 	shift_vals.append(shift_num)
 	
-	if shift_num > rowlen-(rowlen*0.1):
+	if shift_num > rowlen/2:
 		i += (rowlen - shift_num)
 		#i += (-1*shift_num)
 		#i += shift_num - rowlen
-	elif shift_num <= rowlen-(rowlen*0.9):
+	elif shift_num <= rowlen/2:
 		i += (-1*shift_num)
 		#i += (rowlen - shift_num)
 		#i += shift_num
-	else:
-		i += 0
+
 	i_.append(i)
 		
-	filey.write("row:{0} \t maxarg:{1} \t i:{2}\n".format((c+1),shift_num,i))
+	filey.write("row:{0} \t relative_shift:{1} \t\t total_shift:{2}\n".format((c+1),shift_num,i))
 #print shift_vals
 filey.close()
 print len(i_)
-for c, i in enumerate(shift_vals):
-	im[c] = np.copy(shifter(im[c],i))
+
+print i_
+for c, i in enumerate(i_):
+	im[c] = shifter(im[c],i)
 
 
 
