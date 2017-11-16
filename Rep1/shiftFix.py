@@ -12,7 +12,8 @@ im = misc.imread(fn)
 im_org = misc.imread(fn)
 testfile = open(testfilestr,'w')
 
-#function that takes a list/array and moves the values i places left/right by deleting values at the end and inserting 0 values at the start of the list
+#function that takes a list/array and moves the values i places left/right
+#by deleting values at the end and inserting 0 values at the start of the list
 # example = [1,2,3,4,5]
 # shifter(example,2) returns [0,0,1,2,3]
 def shifter(l,i):
