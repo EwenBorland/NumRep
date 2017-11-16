@@ -50,14 +50,11 @@ for rownum in range(len(im)):
 		shift_num = np.argmax(ifft((np.conjugate(fft(im[rownum-1])))*fft(im[rownum])))
 	
 	relative_shifts.append(shift_num)
-	if rownum>5:
-		if relative_shifts[-1:] == relative_shifts[-2:][0] and relative_shifts[-1:] == relative_shifts[-3:][0]:
-			i -= (relative_shifts[-2:][0]+relative_shifts[-3:][0])
+	
 	#Calculating amount the current row needs to be shifted
-	cutoffperc = 0.1
-	if shift_num > rowlen - rowlen*cutoffperc:
+	if shift_num > rowlen/2:
 		i += (rowlen - shift_num)
-	elif shift_num <= rowlen - rowlen*(1-cutoffperc):
+	elif shift_num <= rowlen/2:
 		i += (-1*shift_num)
 
 	total_shifts.append(i)
