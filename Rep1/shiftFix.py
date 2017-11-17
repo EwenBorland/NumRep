@@ -63,8 +63,8 @@ def shiftlength(i,relshift,rowlen):
 for c,shiftnum in enumerate(relative_shifts):
 	#getting the amount of pixels a row needs to be shifted
 	new_i = shiftlength(i,shiftnum,rowlen)
-	
-	cutoffperc = 0.08
+	shift0 = shiftlength(0,shiftnum,rowlen)
+	cutoffperc = 0.05
 	#condition for when the relative shift is consider large
 	if shiftnum in range(int(rowlen*cutoffperc),int(rowlen*(1-cutoffperc)),1) and c <= (len(relative_shifts) - 3):
 		#checking the next 3 rows
@@ -77,6 +77,7 @@ for c,shiftnum in enumerate(relative_shifts):
 			new_i = i
 	
 	#condition for when there is a diagonal feature in the image
+	'''
 	if c>0:
 		prevshift = shiftlength(0,relative_shifts[c-1],rowlen)
 		currshift = shiftlength(0,shiftnum,rowlen)
@@ -87,8 +88,26 @@ for c,shiftnum in enumerate(relative_shifts):
 		
 		if prevshift == currshift and currshift == nextshift:
 			new_i = i
-	
-
+	'''
+	#checking and correcting for diagonal shifts
+	if c < (len(relative_shifts) - 4) and abs(shift0) > 0:
+		#getting the shift of the next 4 lines 
+		shift1 = shiftlength(0,relative_shifts[c+1],rowlen)
+		shift2 = shiftlength(0,relative_shifts[c+2],rowlen)
+		shift3 = shiftlength(0,relative_shifts[c+3],rowlen)
+		shift4 = shiftlength(0,relative_shifts[c+4],rowlen)
+		if not(shift1 == shift0 or shift2 == shift0 or shift3 == shift0 or shift4 == shift0) and not(shift1==0 or shift2==0 or shift3==0 or shift4==0):
+			grad1 = 1.0/abs(shift0-shift1)
+			grad2 = 2.0/abs(shift0-shift2)
+			grad3 = 3.0/abs(shift0-shift3)
+			grad4 = 4.0/abs(shift0-shift4)
+			if 1/grad1 < 5 and 1/grad2 < 5 and 1/grad3 < 5 and 1/grad4 < 5:
+				print "row: {0} , shifts: {1} {2} {3} {4} {5}".format(c,shift0,shift1,shift2,shift3,shift4)
+				new_i -= shift0
+				relative_shifts[c+1] -= shift1
+				relative_shifts[c+2] -= shift2
+				relative_shifts[c+3] -= shift3
+				relative_shifts[c+4] -= shift4
 	
 
 
