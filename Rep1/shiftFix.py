@@ -51,19 +51,51 @@ for rownum in range(len(im)):
 		shift_num = np.argmax(ifft((np.conjugate(fft(im[rownum-1])))*fft(im[rownum])))
 	
 	relative_shifts.append(shift_num)
-	if rownum>5:
-		if relative_shifts[-1:] == relative_shifts[-2:][0] and relative_shifts[-1:] == relative_shifts[-3:][0]:
-			i -= (relative_shifts[-2:][0]+relative_shifts[-3:][0])
-	#Calculating amount the current row needs to be shifted
-	cutoffperc = 0.1
-	if shift_num > rowlen - rowlen*cutoffperc:
-		i += (rowlen - shift_num)
-	elif shift_num <= rowlen - rowlen*(1-cutoffperc):
-		i += (-1*shift_num)
 
-	total_shifts.append(i)
+def shiftlength(i,relshift,rowlen):
+	if relshift > rowlen/2:
+		l = i +(rowlen - relshift)
+	elif relshift <= rowlen/2:
+		l = i +(-1*relshift)
+	return l
+	
+
+for c,shiftnum in enumerate(relative_shifts):
+	#getting the amount of pixels a row needs to be shifted
+	new_i = shiftlength(i,shiftnum,rowlen)
+	
+	cutoffperc = 0.08
+	#condition for when the relative shift is consider large
+	if shiftnum in range(int(rowlen*cutoffperc),int(rowlen*(1-cutoffperc)),1) and c <= (len(relative_shifts) - 3):
+		#checking the next 3 rows
+		#if a row will be shifted > 5 pixels from the current row and also in the opposite direction then a check is True, else False
+		check1 = (shiftlength(0,relative_shifts[c+1],rowlen) > 5) and (shiftlength(0,relative_shifts[c+1],rowlen)*new_i) < 0
+		check2 = (shiftlength(0,relative_shifts[c+2],rowlen) > 5) and (shiftlength(0,relative_shifts[c+2],rowlen)*new_i) < 0
+		check3 = (shiftlength(0,relative_shifts[c+3],rowlen) > 5) and (shiftlength(0,relative_shifts[c+3],rowlen)*new_i) < 0
+		#if no rows shift back then the current row is not shifted
+		if not (check1 or check2 or check3):
+			new_i = i
+	
+	#condition for when there is a diagonal feature in the image
+	if c>0:
+		prevshift = shiftlength(0,relative_shifts[c-1],rowlen)
+		currshift = shiftlength(0,shiftnum,rowlen)
+		if c < (len(relative_shifts)-1):
+			nextshift = shiftlength(0,relative_shifts[c+1],rowlen)
+		else: 
+			nextshift = currshift
 		
-	testfile.write("row:{0} \t relative_shift:{1} \t\t total_shift:{2}\n".format((rownum+1),shift_num,i))
+		if prevshift == currshift and currshift == nextshift:
+			new_i = i
+	
+
+	
+
+
+	total_shifts.append(new_i)
+	i = new_i
+		
+	testfile.write("row:{0} \t relative_shift:{1} \t\t total_shift:{2}\n".format(c,shiftnum,i))
 
 testfile.close()
 
@@ -71,6 +103,12 @@ testfile.close()
 for c, i in enumerate(total_shifts):
 	im[c] = shifter(im[c],i)
 
+lost_pixels = float(sum(total_shifts))
+total_pixels = len(im_org)*len(im_org[0])
+
+lost_perc = 100*(lost_pixels/total_pixels)
+
+print "Total Number of Pixels: {2} , Number of pixels lost: {0} , Percentage of pixels lost: {1}".format(lost_pixels, lost_perc, total_pixels)
 #Plotting
 #plt.imshow(im,cmap=plt.cm.gray)
 misc.imsave(outimage,im)
