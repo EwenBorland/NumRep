@@ -6,7 +6,7 @@ import sys
 #filename
 fn = sys.argv[1]
 testfilestr = fn[:-4] + "_test.txt"
-outimage = fn[:-4] + "_result.pgm"
+outimage = fn[:-4] + "_result.eps"
 #Reading file and making it a numpy array
 im = misc.imread(fn)
 im_org = misc.imread(fn)
@@ -122,7 +122,8 @@ testfile.close()
 for c, i in enumerate(total_shifts):
 	im[c] = shifter(im[c],i)
 
-lost_pixels = float(sum(total_shifts))
+total_shifts_pos = [abs(x) for x in total_shifts]
+lost_pixels = float(sum(total_shifts_pos))
 total_pixels = len(im_org)*len(im_org[0])
 
 lost_perc = 100*(lost_pixels/total_pixels)
