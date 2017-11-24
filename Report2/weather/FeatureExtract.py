@@ -16,7 +16,7 @@ from Weather import *
 # Use the fileSlice to limit the sample size for early evaluation
 
 weatherFile = 'data/basic.txt'
-fileSlice = 0
+fileSlice = 1000
 weather = Weather(weatherFile, fileSlice)
 
 ## Step 3 - Inspect the Data
@@ -135,7 +135,7 @@ print '#'*50
 print '\n'
 
 stationId = weather.getStationData('EDINBURGH/GOGARBANK')
-features = ['Time since midnight', 'Temperature', 'Dew Point']
+features = ['Time since midnight', 'Temperature', 'Dew Point','Weather Type']
 print 'Temperature and Dew Point measurements for Edinburgh 24th October'
 print '(Time since midnight (min), Temperature, Dew Point)'
 print weather.getObservations('3166', obsDate='2017-10-24', features=features)
@@ -188,9 +188,9 @@ weather.append('Wind Relative West', west)
 # To finish create an array of strings containing a subset of the features
 # you feel will perform best in the classification. Call the select() method to filter the data
 
-features = ['Temperature', 'Visibilty', 'Pressure', 'Pressure Trend', 'Humidity']
+features = ['Temperature', 'Visibility', 'Pressure', 'Pressure Trend', 'Humidity','Wind Speed','Weather Type']
 weather.select(features)
-
+print weather.getFeatures()
 ## Step 10 - Export data
 
 # Run the `export()` method to write the data of your selected features to file as a `pickle` object.
