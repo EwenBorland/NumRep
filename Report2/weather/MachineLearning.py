@@ -7,8 +7,10 @@ import numpy as np
 ## sklearn classification packages
 
 from sklearn.tree import export_graphviz
+from sklearn import tree
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
+
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -17,7 +19,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 import time 
 #Loading weather data created from FeatureExtraction.py
-weather = pickle.load(open('data/mldataadv.p'))
+weather = pickle.load(open('data/mldata.p'))
 
 # Confirm that the data has loaded correctly by inspecting the data attributes in the `weather` object.
 print weather.getNrEntries()
@@ -41,6 +43,10 @@ weather_train , weather_test, result_train, result_test= train_test_split(weathe
 classifiers = [DecisionTreeClassifier(max_depth=10),RandomForestClassifier(),MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),KNeighborsClassifier(n_neighbors=100,weights='distance'),GradientBoostingClassifier()]
 names = ["Decision Tree Classifier","Random Forest Classifier","MLP Classifier (Neural Network)","K Nearest Neighbor Classifier","Gradient Boosting"]
 predictions = []
+
+#clf = DecisionTreeClassifier().fit(weather_train,result_train)
+#dot_data = tree.export_graphviz(clf, out_file="dectree.dot",feature_names=weather.getFeatures(),class_names=["0","1","2"])
+
 
 # creating predicted data sets for each classifier
 # initialises a classifier, fits the classifier to the training set, then predicts a data set using the test data.
@@ -85,7 +91,7 @@ for i in range(len(classifier_lists)):
 print classifier_avelist
 
 
-
+'''
 
 
 
