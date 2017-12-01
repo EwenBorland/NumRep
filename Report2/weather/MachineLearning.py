@@ -8,31 +8,21 @@ import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier , RadiusNeighborsClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 #Loading weather data created from FeatureExtraction.py
 weather = pickle.load(open('data/mldata.p'))
-
 
 # Confirm that the data has loaded correctly by inspecting the data attributes in the `weather` object.
 print weather.getNrEntries()
 print weather.getTargetNames()
 print weather.getFeatures()
-
-
-## Step 2 - Define the training and testing sample
-#
-# Divide the weather data into a suitable training and testing sample.
-# Start with a 50/50 split but make this easily adaptable for futher fitting evaluation.
-#
-# *Examples*:
-# [`sklearn.model_selection.train_test_split`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
-
 
 
 # DEFINE TRAINING AND TESTING SAMPLES AND TARGETS HERE
@@ -46,45 +36,53 @@ for i in range(len(weather.data)):
 weather.delete('Weather Type')
 
 #creating the test and train files
-weather_train , weather_test, result_train, result_test= train_test_split(weather.data,obs_types,test_size=0.3)
+trainsize = 0.5
+weather_train , weather_test, result_train, result_test= train_test_split(weather.data,obs_types,train_size=trainsize)
 
 
 # list of the classification methods to use
-allclassifiers = [DecisionTreeClassifier,RandomForestClassifier,OneVsRestClassifier,RadiusNeighborsClassifier(radius=10.0)]
-classifiers = [DecisionTreeClassifier(),RandomForestClassifier(),KNeighborsClassifier(n_neighbors=10),BaggingClassifier(KNeighborsClassifier(),max_samples=0.5, max_features=0.5),MLPClassifier()]
-names = ["Decision Tree Classifier","Random Forest Classifier","K Nearest Neighbor Classifier","Bagging Classifier","MLP Classifier (Neural Network)"]
+classifiers = [DecisionTreeClassifier(),RandomForestClassifier(),MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),KNeighborsClassifier(n_neighbors=100,weights='distance'),GradientBoostingClassifier()]
+names = ["Decision Tree Classifier","Random Forest Classifier","MLP Classifier (Neural Network)","K Nearest Neighbor Classifier","Gradient Boosting"]
 predictions = []
 
 # creating predicted data sets for each classifier
 # initialises a classifier, fits the classifier to the training set, then predicts a data set using the test data.
- 
-for classifier in classifiers:
-	predictions.append(classifier.fit(weather_train,result_train).predict(weather_test))
-
-
+ntot = 10
+runresults = []
+nruns=0
+while nruns < ntot:	 
+	for classifier in classifiers:
+		predictions.append(classifier.fit(weather_train,result_train).predict(weather_test))
+	runresults.append(predictions)
+	print "Run {0} complete".format(nruns)
+	nruns +=1
 
 ## Step 6 - Prediction Evaluation
 
-# Use the `sklearn.metrics` module to compare the results using the expected and predicted datasets.
-
-# Examples:
-# - [Sklearn Model Evaluation](http://scikit-learn.org/stable/modules/model_evaluation.html#)
-# - [Handwritten Digits example](http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#sphx-glr-auto-examples-classification-plot-digits-classification-py)
-#dot_data = export_graphviz(clf, out_file="clf1.dot")
-# RUN PREDICTION EVALUATION METHODS HERE
-
-#printing classification_report() results to the console for each classifier
+#printing classification_report() results to the console for each classifier in the first run
 for i in range(len(classifiers)):
 	print "---------------------------------------------"
 	#print classifiers[i].__name__
 	print names[i]
-	print classification_report(result_test,predictions[i])
+	print classification_report(result_test,runresults[0][i])
 
+runsreport = []
 
+for j in range(ntot):
+	runreport = []
+	for i in range(len(classifiers)):
+		runreport.append([i,precision_recall_fscore_support(result_test,runresults[j][i])])
+	runsreport.append(runreport)
 
+classresultlists = []
 
-
-
-
+for i in runsreport:
+	precrecfsup = []
+	for j in i:
+		#i is a classifier, j is the precision, recall ...
+		precrecfsup.append(j)
+	classresultlists.append(precrecfsup)
+print classresultlists
+#classresultlist[q][r][s] corresponds to run
 
 
