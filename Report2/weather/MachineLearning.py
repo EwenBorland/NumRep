@@ -1,17 +1,13 @@
-
-
 #Importing packages
 import graphviz
 import pickle
 import numpy as np
 ## sklearn classification packages
-
 from sklearn.tree import export_graphviz
 from sklearn import tree
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
-
-
+#Classifiers
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -35,40 +31,49 @@ for i in range(len(weather.data)):
 weather.delete('Weather Type')
 
 #creating the test and train files
+#trainsize 0.5 means the training file is 50% of the input data
 trainsize = 0.5
 weather_train , weather_test, result_train, result_test= train_test_split(weather.data,obs_types,train_size=trainsize)
 
+# list containing the classification methods to use
+classifiers = [
+	DecisionTreeClassifier(max_depth=10),
+	RandomForestClassifier(),
+	MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),
+	KNeighborsClassifier(n_neighbors=100,weights='distance'),
+	GradientBoostingClassifier()]
+names = [
+	"Decision Tree Classifier",
+	"Random Forest Classifier",
+	"MLP Classifier (Neural Network)",
+	"K Nearest Neighbor Classifier",
+	"Gradient Boosting"]
 
-# list of the classification methods to use
-classifiers = [DecisionTreeClassifier(max_depth=10),RandomForestClassifier(),MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),KNeighborsClassifier(n_neighbors=100,weights='distance'),GradientBoostingClassifier()]
-names = ["Decision Tree Classifier","Random Forest Classifier","MLP Classifier (Neural Network)","K Nearest Neighbor Classifier","Gradient Boosting"]
-predictions = []
-
+#creating a graphic of a decision tree
 #clf = DecisionTreeClassifier().fit(weather_train,result_train)
 #dot_data = tree.export_graphviz(clf, out_file="dectree.dot",feature_names=weather.getFeatures(),class_names=["0","1","2"])
 
 
 # creating predicted data sets for each classifier
-# initialises a classifier, fits the classifier to the training set, then predicts a data set using the test data.
-ntot = 15
+ntot = 3
 runresults = []
 nruns=0
-while nruns < ntot:	 
+while nruns < ntot:
+	predictions = []
 	t1 = time.time()
 	for classifier in classifiers:
+		# initialises a classifier, fits the classifier to the training set, then predicts a data set using the test data.
 		predictions.append(classifier.fit(weather_train,result_train).predict(weather_test))
 	runresults.append(predictions)
 	print "Run {0} complete, time = {1}s".format(nruns,(time.time()-t1))
 	nruns +=1
-
-## Step 6 - Prediction Evaluation
 
 #printing classification_report() results to the console for each classifier in the first run
 for i in range(len(classifiers)):
 	print "---------------------------------------------"
 	#print classifiers[i].__name__
 	print names[i]
-	print classification_report(result_test,runresults[5][i])
+	print classification_report(result_test,runresults[0][i])
 
 #creating a list of empty lists, each empty list represents a classifier
 classifier_lists = [[] for _ in range(len(classifiers))]
@@ -79,7 +84,6 @@ for j in range(len(classifier_lists)):
 		classifier_lists[j].append(precision_recall_fscore_support(result_test,i[j]))
 
 classifier_avelist = []
-
 for i in range(len(classifier_lists)):
 	prec = []
 	reca = []
@@ -87,11 +91,6 @@ for i in range(len(classifier_lists)):
 		prec.append(np.average(j[0]))
 		reca.append(np.average(j[1]))
 	classifier_avelist.append([np.average(prec),np.average(reca)])
-	
+
+#printing the results	
 print classifier_avelist
-
-
-'''
-
-
-
