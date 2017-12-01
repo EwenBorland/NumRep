@@ -16,7 +16,7 @@ from Weather import *
 # Use the fileSlice to limit the sample size for early evaluation
 
 weatherFile = 'data/basic.txt'
-fileSlice = 1000
+fileSlice = 0
 weather = Weather(weatherFile, fileSlice)
 
 ## Step 3 - Inspect the Data
@@ -188,7 +188,24 @@ weather.append('Wind Relative West', west)
 # To finish create an array of strings containing a subset of the features
 # you feel will perform best in the classification. Call the select() method to filter the data
 
-features = ['Temperature', 'Visibility', 'Pressure', 'Pressure Trend', 'Humidity','Wind Speed','Weather Type']
+features = [
+	#'Station ID', 
+	#'Station Name' ,
+	'Elevation',
+	'Latitude', 
+	'Longitude', 
+	#'Date',
+	'Time since midnight', 
+	'Gust', 
+	'Temperature', 
+	'Visibility', 
+	'Wind Direction',
+	'Wind Speed', 
+	'Pressure', 
+	'Pressure Trend', 
+	'Dew Point', 
+	'Humidity',
+	'Weather Type']
 weather.select(features)
 print weather.getFeatures()
 ## Step 10 - Export data

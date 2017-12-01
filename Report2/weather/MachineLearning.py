@@ -3,29 +3,26 @@
 #Importing packages
 import graphviz
 import pickle
-
+import numpy as np
 ## sklearn classification packages
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
+
 from sklearn.tree import export_graphviz
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.svm import LinearSVC
-from sklearn.neighbors import KNeighborsClassifier , RadiusNeighborsClassifier
-from sklearn.ensemble import BaggingClassifier
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+import time 
 #Loading weather data created from FeatureExtraction.py
-weather = pickle.load(open('data/mldata.p'))
+weather = pickle.load(open('data/mldataadv.p'))
 
 # Confirm that the data has loaded correctly by inspecting the data attributes in the `weather` object.
 print weather.getNrEntries()
 print weather.getTargetNames()
 print weather.getFeatures()
-
-
-# DEFINE TRAINING AND TESTING SAMPLES AND TARGETS HERE
 
 #separating the feature data from the weather type data
 obs_types = []
@@ -41,20 +38,21 @@ weather_train , weather_test, result_train, result_test= train_test_split(weathe
 
 
 # list of the classification methods to use
-classifiers = [DecisionTreeClassifier(),RandomForestClassifier(),MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),KNeighborsClassifier(n_neighbors=100,weights='distance'),GradientBoostingClassifier()]
+classifiers = [DecisionTreeClassifier(max_depth=10),RandomForestClassifier(),MLPClassifier(hidden_layer_sizes=(100,100,100, ),solver='adam'),KNeighborsClassifier(n_neighbors=100,weights='distance'),GradientBoostingClassifier()]
 names = ["Decision Tree Classifier","Random Forest Classifier","MLP Classifier (Neural Network)","K Nearest Neighbor Classifier","Gradient Boosting"]
 predictions = []
 
 # creating predicted data sets for each classifier
 # initialises a classifier, fits the classifier to the training set, then predicts a data set using the test data.
-ntot = 10
+ntot = 15
 runresults = []
 nruns=0
 while nruns < ntot:	 
+	t1 = time.time()
 	for classifier in classifiers:
 		predictions.append(classifier.fit(weather_train,result_train).predict(weather_test))
 	runresults.append(predictions)
-	print "Run {0} complete".format(nruns)
+	print "Run {0} complete, time = {1}s".format(nruns,(time.time()-t1))
 	nruns +=1
 
 ## Step 6 - Prediction Evaluation
@@ -64,25 +62,30 @@ for i in range(len(classifiers)):
 	print "---------------------------------------------"
 	#print classifiers[i].__name__
 	print names[i]
-	print classification_report(result_test,runresults[0][i])
+	print classification_report(result_test,runresults[5][i])
 
-runsreport = []
+#creating a list of empty lists, each empty list represents a classifier
+classifier_lists = [[] for _ in range(len(classifiers))]
 
-for j in range(ntot):
-	runreport = []
-	for i in range(len(classifiers)):
-		runreport.append([i,precision_recall_fscore_support(result_test,runresults[j][i])])
-	runsreport.append(runreport)
+#loop to get the accuracy information in each run and organise into the classifier lists
+for j in range(len(classifier_lists)):
+	for i in runresults:
+		classifier_lists[j].append(precision_recall_fscore_support(result_test,i[j]))
 
-classresultlists = []
+classifier_avelist = []
 
-for i in runsreport:
-	precrecfsup = []
-	for j in i:
-		#i is a classifier, j is the precision, recall ...
-		precrecfsup.append(j)
-	classresultlists.append(precrecfsup)
-print classresultlists
-#classresultlist[q][r][s] corresponds to run
+for i in range(len(classifier_lists)):
+	prec = []
+	reca = []
+	for j in classifier_lists[i]:
+		prec.append(np.average(j[0]))
+		reca.append(np.average(j[1]))
+	classifier_avelist.append([np.average(prec),np.average(reca)])
+	
+print classifier_avelist
+
+
+
+
 
 
